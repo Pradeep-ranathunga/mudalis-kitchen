@@ -371,3 +371,20 @@ input:focus {
     color: #777;
     font-size: 0.9rem;
 }
+
+nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    background: rgba(10, 10, 10, 0.8); /* විනිවිද පෙනෙන අඳුරු පැහැය */
+    backdrop-filter: blur(15px); /* පිටුපස Blur කරන Magic එක */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: 0.4s;
+}
+
+nav.scrolled {
+    padding: 10px 10%;
+    background: rgba(0, 0, 0, 0.95);
+}
+

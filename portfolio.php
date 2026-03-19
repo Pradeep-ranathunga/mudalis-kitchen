@@ -1,27 +1,26 @@
 <?php include 'includes/header.php'; ?>
-
-<div class="portfolio-container">
-    <h1>Mudali's Masterpieces</h1>
-    <p>Watch and Learn the Art of Cooking</p>
-    
+<div class="portfolio-container" style="padding: 120px 10% 50px;">
+    <h1 style="text-align: center; color: #fff;">Mudali's Masterpieces</h1>
     <div class="video-grid">
         <?php
-        include 'includes/db_connect.php';
+        $search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
         $sql = "SELECT * FROM recipes";
+        if($search != '') { $sql .= " WHERE title LIKE '%$search%'"; }
+        $sql .= " ORDER BY id DESC";
+        
         $result = $conn->query($sql);
         while($row = $result->fetch_assoc()) {
-            // YouTube URL එක embed link එකක් බවට පත් කිරීම
             $url = $row['youtube_link'];
-            $step1 = str_replace("watch?v=", "embed/", $url);
-            $final_url = explode("&", $step1)[0]; 
+            preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $url, $match);
+            $video_id = $match[1] ?? '';
+            $final_url = "https://www.youtube.com/embed/" . $video_id;
 
             echo '<div class="video-card">';
-            echo '<iframe src="'.$final_url.'" allowfullscreen></iframe>';
+            echo '<div class="video-wrapper"><iframe src="'.$final_url.'" allowfullscreen></iframe></div>';
             echo '<h3>'.$row['title'].'</h3>';
             echo '</div>';
         }
         ?>
     </div>
 </div>
-
 <?php include 'includes/footer.php'; ?>

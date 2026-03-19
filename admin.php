@@ -1,182 +1,191 @@
-<?php include 'includes/db_connect.php'; ?>
- <?php
+<?php 
+include 'includes/db_connect.php'; 
 session_start();
-if(!isset($_SESSION['admin_user'])){
-    header("Location: login.php");
-    exit();
+
+// Admin Login පරීක්ෂාව
+if(!isset($_SESSION['admin_user'])){ 
+    header("Location: login.php"); 
+    exit(); 
+}
+
+// 1. Recipe එකතු කිරීමේ Logic එක
+if(isset($_POST['add_recipe'])){
+    $title = $conn->real_escape_string($_POST['title']);
+    $link = $conn->real_escape_string($_POST['youtube_link']);
+    $desc = $conn->real_escape_string($_POST['description']);
+    $conn->query("INSERT INTO recipes (title, youtube_link, description) VALUES ('$title', '$link', '$desc')");
+    header("Location: admin.php?success=1");
+}
+
+// 2. Package එකතු කිරීමේ Logic එක
+if(isset($_POST['add_package'])){
+    $p_name = $conn->real_escape_string($_POST['p_name']);
+    $p_price = $conn->real_escape_string($_POST['p_price']);
+    $p_features = $conn->real_escape_string($_POST['p_features']);
+    
+    $target_dir = "assets/images/packages/";
+    if (!file_exists($target_dir)) { mkdir($target_dir, 0777, true); }
+
+    $file_name = time() . '_' . basename($_FILES["p_image"]["name"]);
+    $target_file = $target_dir . $file_name;
+
+    if(move_uploaded_file($_FILES["p_image"]["tmp_name"], $target_file)){
+        $conn->query("INSERT INTO packages (name, price, features, image_url) VALUES ('$p_name', '$p_price', '$p_features', '$target_file')");
+        header("Location: admin.php?success=1");
+    }
+}
+
+// 3. Delete Logic (Recipes & Packages)
+if(isset($_GET['delete_id'])){ 
+    $conn->query("DELETE FROM recipes WHERE id = ".(int)$_GET['delete_id']); 
+    header("Location: admin.php"); 
+}
+if(isset($_GET['delete_pkg'])){ 
+    $conn->query("DELETE FROM packages WHERE id = ".(int)$_GET['delete_pkg']); 
+    header("Location: admin.php"); 
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin - Add New Recipe</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+    <title>Admin Dashboard | Mudali's Kitchen</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        .admin-form { max-width: 500px; margin: 50px auto; padding: 20px; background: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 8px; }
-        .admin-form input, .admin-form textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; }
-        .btn-submit { background: #d35400; color: white; border: none; cursor: pointer; font-weight: bold; }
-    </style>                                                   
-     <style>
-    .admin-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 20px;
-        background: #222;
-        border-radius: 10px;
-        margin-bottom: 20px;
-    }
-    .logout-btn {
-        background: #c0392b;
-        color: white;
-        padding: 8px 15px;
-        text-decoration: none;
-        border-radius: 5px;
-        font-size: 0.9rem;
-        transition: 0.3s;
-    }
-    .logout-btn:hover {
-        background: #e74c3c;
-    }
-    .admin-container {
-        max-width: 600px;
-        margin: 50px auto;
-    }
-    .back-btn {
-    background: #444;
-    color: white;
-    padding: 8px 15px;
-    text-decoration: none;
-    border-radius: 5px;
-    font-size: 0.9rem;
-    transition: 0.3s;
-}
+        :root { --accent: #d35400; --bg: #050505; --card: #111; --sidebar: #0a0a0a; }
+        body { margin: 0; font-family: 'Poppins', sans-serif; background: var(--bg); color: #fff; display: flex; }
+        
+        /* Sidebar Styles */
+        .sidebar { width: 250px; background: var(--sidebar); height: 100vh; position: fixed; border-right: 1px solid #222; padding: 30px 20px; }
+        .sidebar h2 { color: var(--accent); font-family: 'Playfair Display', serif; margin-bottom: 40px; }
+        .nav-item { padding: 15px; color: #888; text-decoration: none; display: block; border-radius: 10px; margin-bottom: 5px; transition: 0.3s; cursor: pointer; }
+        .nav-item:hover, .nav-item.active { background: #1a1a1a; color: #fff; border-left: 4px solid var(--accent); }
+        .nav-item i { margin-right: 10px; }
 
-.back-btn:hover {
-    background: var(--accent); /* අපි කලින් හදපු තැඹිලි පාට */
-    color: #fff;
-}
-
-.admin-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #1a1a1a;
-    padding: 15px 25px;
-    border-radius: 12px;
-    border: 1px solid #333;
-}
-</style>
+        /* Main Content */
+        .main-content { margin-left: 290px; padding: 40px; width: calc(100% - 330px); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .admin-card { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid #222; margin-bottom: 30px; }
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        
+        input, textarea { width: 100%; background: #1a1a1a; border: 1px solid #333; padding: 12px; margin: 10px 0; border-radius: 10px; color: #fff; box-sizing: border-box; }
+        .btn-add { background: var(--accent); color: #fff; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { text-align: left; color: #666; padding: 10px; border-bottom: 1px solid #222; font-size: 0.8rem; }
+        td { padding: 15px 10px; border-bottom: 1px solid #111; font-size: 0.9rem; }
+        .logout-btn { color: #ff4d4d; text-decoration: none; border: 1px solid #ff4d4d; padding: 8px 15px; border-radius: 8px; font-size: 0.8rem; }
+        
+        /* Animation */
+        .admin-section { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </head>
-<body>                                                      
+<body>
 
-<div class="admin-header">
-    <div>
-        <a href="index.php" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Site</a>
-        <span style="color: #fff; margin-left: 15px;">Logged in as: <strong><?php echo $_SESSION['admin_user']; ?></strong></span>
+<div class="sidebar">
+    <h2>Mudali Admin</h2>
+    <a href="index.php" class="nav-item"><i class="fas fa-home"></i> Back to Site</a>
+    <div class="nav-item active" onclick="showSection('recipes', this)"><i class="fas fa-utensils"></i> Manage Recipes</div>
+    <div class="nav-item" onclick="showSection('packages', this)"><i class="fas fa-camera"></i> Manage Packages</div>
+    <div class="nav-item" onclick="showSection('feedbacks', this)"><i class="fas fa-comment"></i> Feedbacks</div>
+</div>
+
+<div class="main-content">
+    <div class="header">
+        <h1>Welcome, <span style="color:var(--accent);"><?php echo $_SESSION['admin_user']; ?></span></h1>
+        <a href="logout.php" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </div>
-    <a href="logout.php" class="logout-btn">Logout</a>
+
+    <div id="recipes" class="admin-section">
+        <div class="admin-card">
+            <h2><i class="fas fa-utensils"></i> Manage Recipes</h2>
+            <div class="dashboard-grid">
+                <form action="admin.php" method="POST">
+                    <input type="text" name="title" placeholder="Recipe Title" required>
+                    <input type="text" name="youtube_link" placeholder="YouTube Link" required>
+                    <textarea name="description" placeholder="Short Description"></textarea>
+                    <button type="submit" name="add_recipe" class="btn-add">Add Recipe</button>
+                </form>
+                <div style="max-height: 400px; overflow-y: auto;">
+                    <table>
+                        <thead><tr><th>Title</th><th>Action</th></tr></thead>
+                        <tbody>
+                            <?php $res = $conn->query("SELECT * FROM recipes ORDER BY id DESC");
+                            while($row = $res->fetch_assoc()): ?>
+                                <tr><td><?php echo $row['title']; ?></td>
+                                <td><a href="admin.php?delete_id=<?php echo $row['id']; ?>" onclick="return confirm('Delete?')" style="color:#ff4d4d;"><i class="fas fa-trash"></i></a></td></tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="packages" class="admin-section" style="display:none;">
+        <div class="admin-card">
+            <h2><i class="fas fa-camera"></i> Manage Photography Packages</h2>
+            <div class="dashboard-grid">
+                <form action="admin.php" method="POST" enctype="multipart/form-data">
+                    <input type="text" name="p_name" placeholder="Package Name" required>
+                    <input type="text" name="p_price" placeholder="Price" required>
+                    <textarea name="p_features" placeholder="Features (comma separated)"></textarea>
+                    <input type="file" name="p_image" accept="image/*" required>
+                    <button type="submit" name="add_package" class="btn-add">Add Package</button>
+                </form>
+                <div style="max-height: 400px; overflow-y: auto;">
+                    <table>
+                        <thead><tr><th>Photo</th><th>Package</th><th>Action</th></tr></thead>
+                        <tbody>
+                            <?php $pkgs = $conn->query("SELECT * FROM packages ORDER BY id DESC");
+                            while($p = $pkgs->fetch_assoc()): ?>
+                                <tr><td><img src="<?php echo $p['image_url']; ?>" style="width:40px; border-radius:5px;"></td>
+                                <td><?php echo $p['name']; ?></td>
+                                <td><a href="admin.php?delete_pkg=<?php echo $p['id']; ?>" onclick="return confirm('Delete?')" style="color:#ff4d4d;"><i class="fas fa-trash"></i></a></td></tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="feedbacks" class="admin-section" style="display:none;">
+        <div class="admin-card">
+            <h2><i class="fas fa-comment"></i> Pending Feedbacks</h2>
+            <table>
+                <thead><tr><th>Client</th><th>Comment</th><th>Action</th></tr></thead>
+                <tbody>
+                    <?php $pending = $conn->query("SELECT * FROM feedbacks WHERE status='pending' ORDER BY id DESC");
+                    while($fb = $pending->fetch_assoc()): ?>
+                        <tr><td><?php echo $fb['name']; ?></td>
+                        <td style="color:#888; font-style:italic;">"<?php echo $fb['comment']; ?>"</td>
+                        <td><a href="approve_fb.php?id=<?php echo $fb['id']; ?>" style="color:#2ecc71; text-decoration:none; font-weight:bold;">Approve</a></td></tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
-<div class="admin-form">
-    <h2>Add New YouTube Recipe</h2>
-    <form action="admin.php" method="POST">
-        <input type="text" name="title" placeholder="Recipe Title (කෑමේ නම)" required>
-        <input type="text" name="youtube_link" placeholder="YouTube Video Link (URL)" required>
-        <textarea name="description" placeholder="Short Description (කෙටි විස්තරයක්)" rows="4"></textarea>
-        <button type="submit" name="submit" class="btn-submit">Add to Portfolio</button>
-    </form>
 
-    <?php
-    if(isset($_POST['submit'])){
-        $title = $_POST['title'];
-        $link = $_POST['youtube_link'];
-        $desc = $_POST['description'];
-
-        $sql = "INSERT INTO recipes (title, youtube_link, description) VALUES ('$title', '$link', '$desc')";
-
-        if ($conn->query($sql) === TRUE) {
-            echo "<p style='color:green;'>Recipe added successfully!</p>";
-        } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
-        }
-    }
-    ?>
-</div>
-
-<?php
-// 1. Delete කිරීමේ logic එක
-if(isset($_GET['delete_id'])){
-    $id = $_GET['delete_id'];
-    $delete_sql = "DELETE FROM recipes WHERE id = $id";
+<script>
+function showSection(sectionId, element) {
+    // සියලුම Section සඟවන්න
+    document.querySelectorAll('.admin-section').forEach(section => {
+        section.style.display = 'none';
+    });
+    // තෝරාගත් Section එක පෙන්වන්න
+    document.getElementById(sectionId).style.display = 'block';
     
-    if($conn->query($delete_sql) === TRUE){
-        echo "<script>alert('Recipe deleted successfully!'); window.location='admin.php';</script>";
-    } else {
-        echo "Error deleting record: " . $conn->error;
-    }
+    // Sidebar active class එක මාරු කරන්න
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    element.classList.add('active');
 }
+</script>
 
-// 2. දැනට තියෙන Recipes පෙන්වන ලැයිස්තුව
-?>
-<div class="admin-container" style="margin-top: 30px;">
-    <h3 style="color: #fff; border-bottom: 2px solid var(--accent); padding-bottom: 10px;">Manage Your Recipes</h3>
-    <table style="width: 100%; border-collapse: collapse; margin-top: 20px; color: #fff; background: var(--card-dark); border-radius: 10px; overflow: hidden;">
-        <thead>
-            <tr style="background: #222; text-align: left;">
-                <th style="padding: 15px;">Title</th>
-                <th style="padding: 15px;">Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            $fetch_sql = "SELECT * FROM recipes ORDER BY id DESC";
-            $all_recipes = $conn->query($fetch_sql);
-            
-            if($all_recipes->num_rows > 0){
-                while($row = $all_recipes->fetch_assoc()){
-                    echo "<tr style='border-bottom: 1px solid #333;'>";
-                    echo "<td style='padding: 15px;'>" . $row['title'] . "</td>";
-                    echo "<td style='padding: 15px;'>
-                            <a href='admin.php?delete_id=" . $row['id'] . "' 
-                               onclick=\"return confirm('Are you sure you want to delete this?')\" 
-                               style='color: #ff4d4d; text-decoration: none; font-weight: bold;'>
-                               <i class='fas fa-trash'></i> Delete
-                            </a>
-                          </td>";
-                    echo "</tr>";
-                }
-            } else {
-                echo "<tr><td colspan='2' style='padding: 15px; text-align: center;'>No recipes found.</td></tr>";
-            }
-            ?>
-        </tbody>
-    </table>
-</div>
-<section class="admin-container" style="margin-top: 50px; padding: 20px;">
-    <h2 style="color: #fff; border-bottom: 2px solid var(--accent); padding-bottom: 10px;">Pending Client Feedbacks</h2>
-    <table style="width: 100%; color: #fff; background: #1a1a1a; border-radius: 10px; margin-top: 20px; border-collapse: collapse;">
-        <tr style="background: #222; text-align: left;">
-            <th style="padding: 15px;">Name</th>
-            <th style="padding: 15px;">Rating</th>
-            <th style="padding: 15px;">Comment</th>
-            <th style="padding: 15px;">Action</th>
-        </tr>
-        <?php
-        $pending = $conn->query("SELECT * FROM feedbacks WHERE status='pending'");
-        while($row = $pending->fetch_assoc()) {
-            echo "<tr style='border-bottom: 1px solid #333;'>";
-            echo "<td style='padding: 15px;'>".$row['name']."</td>";
-            echo "<td style='padding: 15px;'>".$row['rating']." Stars</td>";
-            echo "<td style='padding: 15px;'>".$row['comment']."</td>";
-            echo "<td style='padding: 15px;'>
-                    <a href='approve_fb.php?id=".$row['id']."' style='color: #2ecc71; text-decoration: none;'>Approve</a> | 
-                    <a href='delete_fb.php?id=".$row['id']."' style='color: #e74c3c; text-decoration: none;'>Delete</a>
-                  </td>";
-            echo "</tr>";
-        }
-        ?>
-    </table>
-</section>
 </body>
 </html>

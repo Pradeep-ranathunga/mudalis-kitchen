@@ -20,3 +20,5 @@
 </footer>
 
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script> AOS.init({ duration: 1000, once: true }); </script>s

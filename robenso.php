@@ -19,25 +19,26 @@ include 'includes/header.php';
     </div>
 </section>
 
-<section class="pricing-section" style="padding: 80px 10%; background: #0a0a0a;">
-    <h2 style="text-align: center; color: #fff; margin-bottom: 50px; font-family: 'Playfair Display', serif;">Investment & Packages</h2>
-    <div class="package-container" style="display: flex; gap: 30px; justify-content: center; flex-wrap: wrap;">
-        <?php
-        $pkg_res = $conn->query("SELECT * FROM packages");
-        if($pkg_res->num_rows > 0):
-            while($pkg = $pkg_res->fetch_assoc()): ?>
-                <div class="package-card" style="background: #161616; padding: 40px; border-radius: 20px; border: 1px solid #333; width: 350px; text-align: center; transition: 0.3s;">
-                    <h3 style="color: var(--accent); font-size: 1.8rem;"><?php echo $pkg['name']; ?></h3>
-                    <h2 style="color: #fff; margin: 20px 0;"><?php echo $pkg['price']; ?></h2>
-                    <p style="color: #888; line-height: 1.6; min-height: 80px;"><?php echo $pkg['features']; ?></p>
-                    <a href="contact.php" class="btn-submit" style="display: inline-block; margin-top: 25px; text-decoration: none;">BOOK NOW</a>
+<div class="package-container" style="display: flex; gap: 30px; justify-content: center; flex-wrap: wrap;">
+    <?php
+    $pkg_res = $conn->query("SELECT * FROM packages ORDER BY id ASC");
+    if($pkg_res->num_rows > 0):
+        while($pkg = $pkg_res->fetch_assoc()): ?>
+            <div class="package-card" style="background: #161616; padding: 25px; border-radius: 20px; border: 1px solid #333; width: 350px; text-align: center; overflow:hidden;">
+                
+                <div style="width: 100%; height: 200px; border-radius: 12px; overflow: hidden; margin-bottom: 20px;">
+                    <img src="<?php echo $pkg['image_url']; ?>" alt="<?php echo $pkg['name']; ?>" style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
-        <?php endwhile; 
-        else: echo "<p style='color:#666;'>No packages available at the moment.</p>";
-        endif; ?>
-    </div>
-</section>
-
+                
+                <h3 style="color: var(--accent); font-size: 1.6rem;"><?php echo $pkg['name']; ?></h3>
+                <h2 style="color: #fff; margin: 15px 0;"><?php echo $pkg['price']; ?></h2>
+                <p style="color: #888; line-height: 1.6; min-height: 80px; font-size:0.9rem;"><?php echo $pkg['features']; ?></p>
+                <a href="contact.php" class="btn-submit" style="display: inline-block; margin-top: 25px; text-decoration: none;">BOOK NOW</a>
+            </div>
+    <?php endwhile; 
+    else: echo "<p style='color:#666;'>No packages available at the moment.</p>";
+    endif; ?>
+</div>
 <section class="feedback-display" style="padding: 80px 10%;">
     <h2 style="text-align: center; color: #fff; margin-bottom: 40px; font-family: 'Playfair Display', serif;">What Our Clients Say</h2>
     <div class="feedback-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
