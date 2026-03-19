@@ -1,0 +1,373 @@
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@700&display=swap');
+
+:root {
+    --bg-dark: #0f0f0f;
+    --card-dark: #1a1a1a;
+    --accent: #d35400; /* Chef Orange */
+    --text-light: #e0e0e0;
+    --gold: #f1c40f;
+}
+
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    overflow-x: hidden;
+}
+
+/* Navigation */
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 10%;
+    background: rgba(26, 26, 26, 0.95);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid #333;
+}
+
+nav .logo h2 {
+    font-family: 'Playfair Display', serif;
+    letter-spacing: 2px;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: var(--text-light);
+    font-weight: 400;
+    transition: 0.3s;
+    font-size: 0.9rem;
+}
+
+nav ul li a:hover {
+    color: var(--accent);
+}
+
+/* Hero Section */
+.hero {
+    height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10%;
+    background: radial-gradient(circle at center, #222 0%, #0f0f0f 100%);
+}
+
+.hero-text h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 4.5rem;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    background: linear-gradient(to right, #fff, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+#chef-img {
+    width: 450px;
+    filter: drop-shadow(0 0 50px rgba(211, 84, 0, 0.2));
+    animation: floating 4s ease-in-out infinite;
+}
+
+@keyframes floating {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+/* Portfolio Video Grid */
+.portfolio-container {
+    padding: 80px 10%;
+}
+
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 40px;
+}
+
+.video-card {
+    background: var(--card-dark);
+    border-radius: 20px;
+    padding: 10px;
+    border: 1px solid #333;
+    transition: 0.4s;
+}
+
+.video-card:hover {
+    border-color: var(--accent);
+    transform: scale(1.03);
+}
+
+.video-card iframe {
+    width: 100%;
+    height: 220px;
+    border-radius: 15px;
+}
+
+/* Forms (Contact & Admin) */
+.form-section {
+    display: flex;
+    justify-content: center;
+    padding: 100px 10%;
+}
+
+.form-container {
+    background: var(--card-dark);
+    padding: 50px;
+    border-radius: 30px;
+    width: 100%;
+    max-width: 500px;
+    border: 1px solid #333;
+}
+
+input, textarea {
+    width: 100%;
+    background: #252525;
+    border: 1px solid #444;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 12px;
+    color: #fff;
+}
+
+input:focus {
+    border-color: var(--accent);
+    outline: none;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 18px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.main-footer {
+    background: #111;
+    color: #fff;
+    padding: 60px 10% 20px;
+    border-top: 1px solid #333;
+    margin-top: 50px;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+.footer-logo h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+}
+
+.footer-logo span { color: var(--accent); }
+
+.social-links a {
+    color: #fff;
+    font-size: 1.5rem;
+    margin-left: 20px;
+    transition: 0.3s;
+}
+
+.social-links a:hover {
+    color: var(--accent);
+    transform: translateY(-5px);
+    display: inline-block;
+}
+
+.footer-bottom {
+    text-align: center;
+    margin-top: 40px;
+    border-top: 1px solid #222;
+    padding-top: 20px;
+    font-size: 0.8rem;
+    color: #777;
+}  
+.scroll-hint {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.arrow-down {
+    margin-top: 10px;
+    font-size: 1.2rem;
+    animation: bounce 2s infinite; /* පාවෙන animation එක */
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+}
+
+.about-section {
+    padding: 100px 10%;
+    background: #0a0a0a;
+}
+
+.about-content {
+    display: flex;
+    gap: 50px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.about-text { flex: 1; min-width: 300px; }
+.about-text h2 { font-size: 3rem; margin-bottom: 20px; font-family: 'Playfair Display', serif; }
+.about-text h2 span { color: var(--accent); }
+.about-text p { line-height: 1.8; color: #aaa; margin-bottom: 30px; }
+
+.stats { display: flex; gap: 40px; }
+.stat-box h3 { font-size: 2.5rem; color: var(--accent); margin: 0; }
+.stat-box p { font-size: 0.9rem; color: #666; }
+
+.about-features {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    min-width: 300px;
+}
+
+.feature-card {
+    background: #1a1a1a;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    border: 1px solid #333;
+    transition: 0.3s;
+}
+
+.feature-card:hover { border-color: var(--accent); transform: translateY(-10px); }
+.feature-card i { font-size: 2rem; color: var(--accent); margin-bottom: 15px; }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    /* Navigation Bar එක සැකසීම */
+    nav {
+        flex-direction: column;
+        padding: 15px;
+    }
+
+    nav ul {
+        margin-top: 15px;
+        gap: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 0;
+    }
+
+    nav ul li a {
+        font-size: 0.8rem;
+    }
+
+    /* Hero Section එක සැකසීම */
+    .hero {
+        flex-direction: column-reverse; /* Chef උඩට සහ අකුරු පල්ලෙහාට */
+        text-align: center;
+        height: auto;
+        padding: 100px 5% 50px;
+    }
+
+    .hero-text h1 {
+        font-size: 2.5rem; /* අකුරු කුඩා කිරීම */
+    }
+
+    #chef-img {
+        width: 80%; /* Chef ගේ රූපය screen එකට ගැලපීම */
+        max-width: 300px;
+        margin-bottom: 30px;
+    }
+
+    /* About Section එක සැකසීම */
+    .about-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .about-features {
+        grid-template-columns: 1fr; /* Feature cards එක පෙළට */
+    }
+
+    .stats {
+        justify-content: center;
+    }
+
+    /* Scroll Hint එක Mobile වලදී අවශ්‍ය නැතිනම් අයින් කරන්න හෝ කුඩා කරන්න */
+    .scroll-hint {
+        bottom: 10px;
+        font-size: 0.6rem;
+    }
+}
+.admin-hidden-link {
+    text-decoration: none;
+    color: #444; /* පසුබිමට සමාන අඳුරු වර්ණයක් */
+    font-size: 0.7rem;
+    transition: 0.3s;
+}
+
+.admin-hidden-link:hover {
+    color: var(--accent); /* Mouse එක ගෙනියනකොට විතරක් පේන්න */
+}
+
+.admin-login-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 10%;
+    background: rgba(0,0,0,0.5);
+}
+
+.back-link {
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: 0.3s;
+}
+
+.back-link:hover {
+    color: var(--accent);
+}
+
+.login-title-section {
+    text-align: center;
+    margin-top: 50px;
+    color: #fff;
+}
+
+.login-title-section h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+}
+
+.login-title-section p {
+    color: #777;
+    font-size: 0.9rem;
+}

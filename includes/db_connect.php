@@ -2,7 +2,7 @@
 $host = "localhost";
 $user = "root";
 $pass = "";
-$dbname = "mudalis_kitchen_db";
+$dbname = "mudalis_kitchen";
 
 $conn = new mysqli($host, $user, $pass, $dbname);
 
